@@ -6,7 +6,7 @@ const { createEventAdapter } = require('@slack/events-api');
 const web = new WebClient(process.env.SLACK_TOKEN)
 const slackSigningSecret = process.env.SLACK_SIGNING_SECRET;
 const slackEvents = createEventAdapter(slackSigningSecret);
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))

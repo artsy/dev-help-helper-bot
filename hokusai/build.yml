@@ -1,0 +1,6 @@
+---
+version: '2'
+services:
+  dev-help-helper-bot:
+    build:
+      context: ../

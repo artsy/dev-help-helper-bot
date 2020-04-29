@@ -1,0 +1,44 @@
+version: 2.1
+
+orbs:
+  hokusai: artsy/hokusai@0.7
+
+not_staging_or_release: &not_staging_or_release
+  filters:
+    branches:
+      ignore:
+        - staging
+        - release
+
+only_master: &only_master
+  context: hokusai
+  filters:
+    branches:
+      only: master
+
+only_release: &only_release
+  context: hokusai
+  filters:
+    branches:
+      only: release
+
+workflows:
+  build-deploy:
+    jobs:
+      - hokusai/test:
+          <<: *not_staging_or_release
+
+      - hokusai/push:
+          name: push-staging-image
+          <<: *only_master
+          requires:
+            - hokusai/test
+
+      - hokusai/deploy-staging:
+          <<: *only_master
+          project-name: dev-help-helper-bot
+          requires:
+            - push-staging-image
+
+      - hokusai/deploy-production:
+          <<: *only_release

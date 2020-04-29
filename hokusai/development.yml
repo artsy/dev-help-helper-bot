@@ -1,0 +1,9 @@
+---
+version: '2'
+services:
+  dev-help-helper-bot:
+    extends:
+      file: build.yml
+      service: dev-help-helper-bot
+    ports:
+      - 3000:3000

@@ -35,7 +35,7 @@ spec:
           image: 585031190124.dkr.ecr.us-east-1.amazonaws.com/dev-help-helper-bot:staging
           imagePullPolicy: Always
           ports:
-            - name: dev-help-helper-bot-http
+            - name: devhelpbot-http
               containerPort: 8080
           resources:
             requests:
@@ -45,7 +45,7 @@ spec:
               memory: 512Mi
           readinessProbe:
             httpGet:
-              port: dev-help-helper-bot-http
+              port: devhelpbot-http
               path: /health/ping
               httpHeaders:
                 - name: X-Forwarded-Proto

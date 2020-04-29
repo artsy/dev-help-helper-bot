@@ -1,4 +1,4 @@
-FROM node:latest-alpine
+FROM node:alpine
 
 WORKDIR /app
 
@@ -10,7 +10,6 @@ RUN apk --no-cache --quiet add \
 
 # Copy files required for installation of application dependencies
 COPY package.json yarn.lock ./
-COPY patches ./patches
 
 # Install application dependencies
 RUN yarn install --frozen-lockfile --quiet
@@ -20,8 +19,7 @@ COPY . ./
 
 # Build application
 # Update file/directory permissions
-RUN yarn build && \
-  chown -R deploy:deploy ./
+RUN chown -R deploy:deploy ./
 
 # Switch to less-privileged user
 USER deploy

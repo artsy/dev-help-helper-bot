@@ -1,7 +1,11 @@
 require('dotenv').config()
 
+const { createServer } = require('http');
+const express = require('express');
 const { WebClient } = require('@slack/web-api');
 const { createEventAdapter } = require('@slack/events-api');
+
+
 
 const web = new WebClient(process.env.SLACK_TOKEN)
 const slackSigningSecret = process.env.SLACK_SIGNING_SECRET;
@@ -49,9 +53,18 @@ slackEvents.on('message', async (event) => {
 	}
 });
 
-(async () => {
-  const server = await slackEvents.start(port);
-  console.log(`Listening for events on ${server.address().port}`);
-})();
 
+
+const app = express();
+
+app.use('/slack/events', slackEvents.requestListener());
+
+app.get('/health/ping', (req, res) => res.send('pong'))
+
+// Initialize a server for the express app - you can skip this and the rest if you prefer to use app.listen()
+const server = createServer(app);
+server.listen(port, () => {
+  // Log a message when the server is ready
+  console.log(`Listening for events on ${server.address().port}`);
+});
 

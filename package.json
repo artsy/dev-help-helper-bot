@@ -11,7 +11,8 @@
   "dependencies": {
     "@slack/events-api": "^2.3.2",
     "@slack/web-api": "^5.8.0",
-    "dotenv": "^8.2.0"
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1"
   },
   "devDependencies": {
     "ngrok": "^3.2.7",

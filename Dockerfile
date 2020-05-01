@@ -10,7 +10,6 @@ RUN apk --no-cache --quiet add \
 
 # Copy files required for installation of application dependencies
 COPY package.json yarn.lock ./
-COPY patches ./patches
 
 # Install application dependencies
 RUN yarn install --frozen-lockfile --quiet

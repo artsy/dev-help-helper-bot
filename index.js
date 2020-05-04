@@ -15,10 +15,10 @@ const port = process.env.PORT || 8080;
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-const addCheckmarkReaction = async (timestamp) => {
+const addCheckmarkReaction = async (channel, timestamp) => {
 	try {
 		await web.reactions.add({ name: 'white_check_mark',
-	channel: CHANNEL_BOT_TESTING,
+	channel,
 	timestamp
  })
 	} catch (error) {
@@ -32,8 +32,8 @@ const CHANNEL_DEV_HELP = 'CP9P4KR35'
 
 // Attach listeners to events by Slack Event "type". See: https://api.slack.com/events/message.im
 slackEvents.on('message', async (event) => {
-	// dont bother if its not the channel we care about
-	if (event.channel !== CHANNEL_BOT_TESTING) return
+	// dont bother if its not the channels we care about
+	if (event.channel !== CHANNEL_BOT_TESTING || event.channel !== CHANNEL_DEV_HELP) return
 
 	// dont bother if its a top-level message in the channel
 	if (event.thread_ts == null) return
@@ -45,7 +45,7 @@ slackEvents.on('message', async (event) => {
 //   console.log({event})
   if (event.text === "solved") {
 	  console.log('mark it!')
-	  await addCheckmarkReaction(event.thread_ts)
+	  await addCheckmarkReaction(event.channel, event.thread_ts)
   } else if (event.text.includes("thanks")||
   event.text.includes("thank you")||
   event.text.includes("solved")) {

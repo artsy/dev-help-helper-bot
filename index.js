@@ -48,6 +48,7 @@ slackEvents.on('message', async (event) => {
 	  await addCheckmarkReaction(event.channel, event.thread_ts)
   } else if (event.text.includes("thanks")||
   event.text.includes("thank you")||
+  event.text.includes("thank")||
   event.text.includes("solved")) {
 	  await web.chat.postEphemeral({channel: event.channel, user: event.user, text: "Remember: You can mark this as solved by typing a message in this thread with a body of just `solved`.", thread_ts: event.thread_ts})
 	}

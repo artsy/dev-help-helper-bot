@@ -144,7 +144,7 @@ spec:
     - port: 443
       protocol: TCP
       name: https
-      targetPort: nginx-https
+      targetPort: nginx-http
   selector:
     app: dev-help-helper-bot
     layer: application

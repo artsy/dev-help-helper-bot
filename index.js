@@ -33,7 +33,7 @@ const CHANNEL_DEV_HELP = 'CP9P4KR35'
 // Attach listeners to events by Slack Event "type". See: https://api.slack.com/events/message.im
 slackEvents.on('message', async (event) => {
 	// dont bother if its not the channels we care about
-	if (event.channel !== CHANNEL_BOT_TESTING || event.channel !== CHANNEL_DEV_HELP) return
+	if (event.channel !== CHANNEL_BOT_TESTING && event.channel !== CHANNEL_DEV_HELP) return
 
 	// dont bother if its a top-level message in the channel
 	if (event.thread_ts == null) return

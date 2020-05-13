@@ -39,6 +39,3 @@ workflows:
           project-name: dev-help-helper-bot
           requires:
             - push-staging-image
-
-      - hokusai/deploy-production:
-          <<: *only_release

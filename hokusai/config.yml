@@ -1,2 +1,4 @@
 ---
 project-name: dev-help-helper-bot
+template-config-files:
+  - s3://artsy-citadel/k8s/hokusai-vars.yml

@@ -57,37 +57,6 @@ spec:
             preStop:
               exec:
                 command: ["sh", "-c", "sleep 10"]
-        - name: dev-help-helper-bot-nginx
-          image: artsy/docker-nginx:1.14.2
-          ports:
-            - name: nginx-http
-              containerPort: 80
-            - name: nginx-https
-              containerPort: 443
-          readinessProbe:
-            tcpSocket:
-              port: nginx-http
-            initialDelaySeconds: 5
-            periodSeconds: 15
-            timeoutSeconds: 5
-          lifecycle:
-            preStop:
-              exec:
-                command: ["sh", "-c", "sleep 5 && /usr/sbin/nginx -s quit"]
-          env:
-            - name: 'NGINX_DEFAULT_CONF'
-              valueFrom:
-                configMapKeyRef:
-                  name: nginx-config
-                  key: default
-          volumeMounts:
-            - name: nginx-secrets
-              mountPath: /etc/nginx/ssl
-      volumes:
-        - name: nginx-secrets
-          secret:
-            secretName: nginx-secrets
-            defaultMode: 420
       dnsPolicy: ClusterFirst
       dnsConfig:
         options:
@@ -126,28 +95,33 @@ metadata:
     app: dev-help-helper-bot
     component: web
     layer: application
-  name: dev-help-helper-bot-web
+  name: dev-help-helper-bot-web-internal
   namespace: default
-  annotations:
-    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:iam::585031190124:server-certificate/2018-01-17_artsy-net-wildcard"
-    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "https"
-    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
-    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
-    service.beta.kubernetes.io/aws-load-balancer-connection-draining-enabled: "true"
-    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "5"
 spec:
   ports:
-    - port: 80
+    - port: 8080
       protocol: TCP
       name: http
-      targetPort: nginx-http
-    - port: 443
-      protocol: TCP
-      name: https
-      targetPort: nginx-https
+      targetPort: 8080
   selector:
     app: dev-help-helper-bot
     layer: application
     component: web
-  sessionAffinity: None
-  type: LoadBalancer
+  type: ClusterIP
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: dev-help-helper-bot
+  annotations:
+    nginx.ingress.kubernetes.io/whitelist-source-range: "{{ cloudflareIpSourceRanges|join(',') }}"
+spec:
+  rules:
+    - host: dev-help-helper-bot-staging.artsy.net
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: dev-help-helper-bot-web-internal
+              servicePort: http

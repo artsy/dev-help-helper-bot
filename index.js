@@ -69,4 +69,3 @@ server.listen(port, () => {
   // Log a message when the server is ready
   console.log(`Listening for events on ${server.address().port}`);
 });
-

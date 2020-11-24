@@ -1,15 +1,24 @@
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dev-help-helper-bot-web
   namespace: default
+  labels:
+    app: dev-help-helper-bot
+    component: web
+    layer: application
 spec:
   strategy:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 0
     type: RollingUpdate
+  selector:
+    matchLabels:
+      app: dev-help-helper-bot
+      component: web
+      layer: application
   template:
     metadata:
       labels:
@@ -80,7 +89,7 @@ metadata:
   namespace: default
 spec:
   scaleTargetRef:
-    apiVersion: extensions/v1beta1
+    apiVersion: apps/v1
     kind: Deployment
     name: dev-help-helper-bot-web
   minReplicas: 1
@@ -110,18 +119,20 @@ spec:
   type: ClusterIP
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: dev-help-helper-bot
   annotations:
     nginx.ingress.kubernetes.io/whitelist-source-range: "{{ cloudflareIpSourceRanges|join(',') }}"
 spec:
+  ingressClassName: nginx
   rules:
     - host: dev-help-helper-bot-staging.artsy.net
       http:
         paths:
           - path: /
+            pathType: Prefix
             backend:
               serviceName: dev-help-helper-bot-web-internal
               servicePort: http

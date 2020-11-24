@@ -28,8 +28,6 @@ workflows:
       - hokusai/push:
           name: push-staging-image
           <<: *only_master
-          requires:
-            - hokusai/test
 
       - hokusai/deploy-staging:
           <<: *only_master

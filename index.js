@@ -1,26 +1,20 @@
 require('dotenv').config()
 
-const { createServer } = require('http');
-const express = require('express');
-const { WebClient } = require('@slack/web-api');
-const { createEventAdapter } = require('@slack/events-api');
-
-
+const { createServer } = require('http')
+const express = require('express')
+const { WebClient } = require('@slack/web-api')
+const { createEventAdapter } = require('@slack/events-api')
 
 const web = new WebClient(process.env.SLACK_TOKEN)
-const slackSigningSecret = process.env.SLACK_SIGNING_SECRET;
-const slackEvents = createEventAdapter(slackSigningSecret);
-const port = process.env.PORT || 8080;
+const slackSigningSecret = process.env.SLACK_SIGNING_SECRET
+const slackEvents = createEventAdapter(slackSigningSecret)
+const port = process.env.PORT || 8080
 
-
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const addCheckmarkReaction = async (channel, timestamp) => {
 	try {
-		await web.reactions.add({ name: 'white_check_mark',
-	channel,
-	timestamp
- })
+		await web.reactions.add({ name: 'white_check_mark', channel, timestamp })
 	} catch (error) {
 		console.log(error)
 	}
@@ -33,7 +27,11 @@ const CHANNEL_DEV_HELP = 'CP9P4KR35'
 // Attach listeners to events by Slack Event "type". See: https://api.slack.com/events/message.im
 slackEvents.on('message', async (event) => {
 	// dont bother if its not the channels we care about
-	if (event.channel !== CHANNEL_BOT_TESTING && event.channel !== CHANNEL_DEV_HELP) return
+	if (
+		event.channel !== CHANNEL_BOT_TESTING &&
+		event.channel !== CHANNEL_DEV_HELP
+	)
+		return
 
 	// dont bother if its a top-level message in the channel
 	if (event.thread_ts == null) return
@@ -41,31 +39,39 @@ slackEvents.on('message', async (event) => {
 	// dont bother if the message is not from the question asker
 	if (event.user !== event.parent_user_id) return
 
-  console.log(`Received a message event: user ${event.user} in channel ${event.channel} says ${event.text} at ${event.ts}`);
-//   console.log({event})
-  if (event.text === "solved") {
-	  console.log('mark it!')
-	  await addCheckmarkReaction(event.channel, event.thread_ts)
-  } else if (event.text.includes("thanks")||
-  event.text.includes("thank you")||
-  event.text.includes("thank")||
-  event.text.startsWith("ty")||
-  event.text.includes("solved")) {
-	  await web.chat.postEphemeral({channel: event.channel, user: event.user, text: "Remember: You can mark this as solved by typing a message in this thread with a body of just `solved`.", thread_ts: event.thread_ts})
+	console.log(
+		`Received a message event: user ${event.user} in channel ${event.channel} says ${event.text} at ${event.ts}`,
+	)
+	//   console.log({event})
+	if (event.text === 'solved') {
+		console.log('mark it!')
+		await addCheckmarkReaction(event.channel, event.thread_ts)
+	} else if (
+		event.text.includes('thanks') ||
+		event.text.includes('thank you') ||
+		event.text.includes('thank') ||
+		event.text.startsWith('ty') ||
+		event.text.includes('solved')
+	) {
+		await web.chat.postEphemeral({
+			channel: event.channel,
+			user: event.user,
+			text:
+				'Remember: You can mark this as solved by typing a message in this thread with a body of just `solved`.',
+			thread_ts: event.thread_ts,
+		})
 	}
-});
+})
 
+const app = express()
 
-
-const app = express();
-
-app.use('/slack/events', slackEvents.requestListener());
+app.use('/slack/events', slackEvents.requestListener())
 
 app.get('/health/ping', (req, res) => res.send('pong'))
 
 // Initialize a server for the express app - you can skip this and the rest if you prefer to use app.listen()
-const server = createServer(app);
+const server = createServer(app)
 server.listen(port, () => {
-  // Log a message when the server is ready
-  console.log(`Listening for events on ${server.address().port}`);
-});
+	// Log a message when the server is ready
+	console.log(`Listening for events on ${server.address().port}`)
+})

@@ -42,15 +42,17 @@ slackEvents.on('message', async (event) => {
 		`Received a message event: user ${event.user} in channel ${event.channel} says ${event.text} at ${event.ts}`,
 	)
 	//   console.log({event})
-	if (event.text === 'solved') {
+
+	const text = event.text.toLowerCase()
+	if (text === 'solved') {
 		console.log('mark it!')
 		await addCheckmarkReaction(event.channel, event.thread_ts)
 	} else if (
-		event.text.includes('thanks') ||
-		event.text.includes('thank you') ||
-		event.text.includes('thank') ||
-		event.text.startsWith('ty') ||
-		event.text.includes('solved')
+		text.includes('thanks') ||
+		text.includes('thank you') ||
+		text.includes('thank') ||
+		text.startsWith('ty') ||
+		text.includes('solved')
 	) {
 		await web.chat.postEphemeral({
 			channel: event.channel,

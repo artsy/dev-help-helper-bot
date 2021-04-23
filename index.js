@@ -21,17 +21,16 @@ const addCheckmarkReaction = async (channel, timestamp) => {
 	console.log('done')
 }
 
-const CHANNEL_BOT_TESTING = 'C012K7XU4LE'
-const CHANNEL_DEV_HELP = 'CP9P4KR35'
+const CHANNELS = [
+	'C012K7XU4LE', // bot-testing
+	'CP9P4KR35', // dev-help
+	'C02BAQ5K7', // practice-mobile
+]
 
 // Attach listeners to events by Slack Event "type". See: https://api.slack.com/events/message.im
 slackEvents.on('message', async (event) => {
 	// dont bother if its not the channels we care about
-	if (
-		event.channel !== CHANNEL_BOT_TESTING &&
-		event.channel !== CHANNEL_DEV_HELP
-	)
-		return
+	if (!CHANNELS.includes(event.channel)) return
 
 	// dont bother if its a top-level message in the channel
 	if (event.thread_ts == null) return

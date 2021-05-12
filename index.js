@@ -10,8 +10,6 @@ const slackSigningSecret = process.env.SLACK_SIGNING_SECRET
 const slackEvents = createEventAdapter(slackSigningSecret)
 const port = process.env.PORT || 8080
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-
 const addCheckmarkReaction = async (channel, timestamp) => {
 	try {
 		await web.reactions.add({ name: 'white_check_mark', channel, timestamp })
@@ -25,6 +23,7 @@ const CHANNELS = [
 	'C012K7XU4LE', // bot-testing
 	'CP9P4KR35', // dev-help
 	'C02BAQ5K7', // practice-mobile
+	'CCC37HXE0', // onboarding-eng
 ]
 
 // Attach listeners to events by Slack Event "type". See: https://api.slack.com/events/message.im

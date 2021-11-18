@@ -24,6 +24,7 @@ const CHANNELS = [
 	'CP9P4KR35', // dev-help
 	'C02BAQ5K7', // practice-mobile
 	'CCC37HXE0', // onboarding-eng
+	'C02L7KPT7T6', // crossfit
 ]
 
 // Attach listeners to events by Slack Event "type". See: https://api.slack.com/events/message.im

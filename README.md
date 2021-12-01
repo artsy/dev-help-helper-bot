@@ -4,8 +4,8 @@ This bot is marking thread that are solved by adding a ✅ on them.
 
 ## Meta
 
-- **Slack App Link:** [Slack Bot App](https://api.slack.com/apps/A013FSQNV96)
-- **Endpoint for Slack:** [Slack Bot App](https://dev-help-helper-bot-staging.artsy.net/slack/events)
+- **Slack App Link:** https://api.slack.com/apps/A013FSQNV96
+- **Endpoint for Slack:** https://dev-help-helper-bot-staging.artsy.net/slack/events
 - **Point People:** [@pvinis](https://github.com/pvinis)
 
 ## How to develop

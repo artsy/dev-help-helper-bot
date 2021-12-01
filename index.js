@@ -25,27 +25,26 @@ const addCheckmarkReaction = async (channel, timestamp) => {
 const hasCheckmarkReaction = async (channel, timestamp) => {
 	try {
 		const response = await web.reactions.get({ channel, timestamp })
-		if (response.message.reactions.find(reaction => reaction.name === 'white_check_mark') !== undefined) {
+		if (response.message.reactions?.find(reaction => reaction.name === 'white_check_mark') !== undefined) {
 			return true
 		}
 		return false
 	} catch (error) {
+		console.error(error)
 		return false
 	}
 }
 
-const CHANNELS = [
-	'C012K7XU4LE', // bot-testing
-	'CP9P4KR35', // dev-help
-	'C02BAQ5K7', // practice-mobile
-	'CCC37HXE0', // onboarding-eng
-	'C02L7KPT7T6', // crossfit
+
+const CHANNELS_TO_EXCLUDE = [
+	// 'C012K7XU4LE', // bot-testing
 ]
 
 // Attach listeners to events by Slack Event "type". See: https://api.slack.com/events/message.im
 slackEvents.on('message', async (event) => {
-	// dont bother if its not the channels we care about
-	if (!CHANNELS.includes(event.channel)) return
+	// dont bother if its the channels we want to exclude
+	console.log({chan: event.channel})
+	if (CHANNELS_TO_EXCLUDE.includes(event.channel)) return
 
 	// dont bother if its a top-level message in the channel
 	if (event.thread_ts == null) return
@@ -54,12 +53,11 @@ slackEvents.on('message', async (event) => {
 	if (event.user !== event.parent_user_id) return
 
 	// dont bother if the checkmark is there already
-	if (hasCheckmarkReaction(event.channel, event.thread_ts)) return
+	if (await hasCheckmarkReaction(event.channel, event.thread_ts)) return
 
 	console.log(
 		`Received a message event: user ${event.user} in channel ${event.channel} says ${event.text} at ${event.ts}`,
 	)
-	//   console.log({event})
 
 	const text = event.text.toLowerCase()
 	if (text === 'solved') {

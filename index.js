@@ -1,9 +1,12 @@
+// @ts-check
+
 require('dotenv').config()
 
 const { createServer } = require('http')
 const express = require('express')
 const { WebClient } = require('@slack/web-api')
 const { createEventAdapter } = require('@slack/events-api')
+
 
 const web = new WebClient(process.env.SLACK_TOKEN)
 const slackSigningSecret = process.env.SLACK_SIGNING_SECRET
@@ -17,6 +20,18 @@ const addCheckmarkReaction = async (channel, timestamp) => {
 		console.log(error)
 	}
 	console.log('done')
+}
+
+const hasCheckmarkReaction = async (channel, timestamp) => {
+	try {
+		const response = await web.reactions.get({ channel, timestamp })
+		if (response.message.reactions.find(reaction => reaction.name === 'white_check_mark') !== undefined) {
+			return true
+		}
+		return false
+	} catch (error) {
+		return false
+	}
 }
 
 const CHANNELS = [
@@ -37,6 +52,9 @@ slackEvents.on('message', async (event) => {
 
 	// dont bother if the message is not from the question asker
 	if (event.user !== event.parent_user_id) return
+
+	// dont bother if the checkmark is there already
+	if (hasCheckmarkReaction(event.channel, event.thread_ts)) return
 
 	console.log(
 		`Received a message event: user ${event.user} in channel ${event.channel} says ${event.text} at ${event.ts}`,
@@ -64,11 +82,14 @@ slackEvents.on('message', async (event) => {
 	}
 })
 
+
 const app = express()
 
 app.use('/slack/events', slackEvents.requestListener())
 
 app.get('/health/ping', (req, res) => res.send('pong'))
+
+app.get('/', (req, res) => res.send('nothing to see here. go to the <a href="https://github.com/artsy/dev-help-helper-bot">repo</a>.'))
 
 // Initialize a server for the express app - you can skip this and the rest if you prefer to use app.listen()
 const server = createServer(app)

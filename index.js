@@ -25,7 +25,11 @@ const addCheckmarkReaction = async (channel, timestamp) => {
 const hasCheckmarkReaction = async (channel, timestamp) => {
 	try {
 		const response = await web.reactions.get({ channel, timestamp })
-		if (response.message.reactions?.find(reaction => reaction.name === 'white_check_mark') !== undefined) {
+		if (
+			response.message.reactions?.find(
+				(reaction) => reaction.name === 'white_check_mark',
+			) !== undefined
+		) {
 			return true
 		}
 		return false
@@ -43,7 +47,6 @@ const CHANNELS_TO_EXCLUDE = [
 // Attach listeners to events by Slack Event "type". See: https://api.slack.com/events/message.im
 slackEvents.on('message', async (event) => {
 	// dont bother if its the channels we want to exclude
-	console.log({chan: event.channel})
 	if (CHANNELS_TO_EXCLUDE.includes(event.channel)) return
 
 	// dont bother if its a top-level message in the channel
@@ -73,8 +76,7 @@ slackEvents.on('message', async (event) => {
 		await web.chat.postEphemeral({
 			channel: event.channel,
 			user: event.user,
-			text:
-				'Remember: You can mark this as solved by typing a message in this thread with a body of just `solved`.',
+			text: 'Remember: You can mark this as solved by typing a message in this thread with a body of just `solved`.',
 			thread_ts: event.thread_ts,
 		})
 	}
@@ -87,7 +89,11 @@ app.use('/slack/events', slackEvents.requestListener())
 
 app.get('/health/ping', (req, res) => res.send('pong'))
 
-app.get('/', (req, res) => res.send('nothing to see here. go to the <a href="https://github.com/artsy/dev-help-helper-bot">repo</a>.'))
+app.get('/', (req, res) =>
+	res.send(
+		'nothing to see here. go to the <a href="https://github.com/artsy/dev-help-helper-bot">repo</a>.',
+	),
+)
 
 // Initialize a server for the express app - you can skip this and the rest if you prefer to use app.listen()
 const server = createServer(app)

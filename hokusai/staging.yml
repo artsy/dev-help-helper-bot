@@ -76,10 +76,10 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
-                - key: tier
-                  operator: In
-                  values:
-                    - foreground
+                  - key: tier
+                    operator: In
+                    values:
+                      - foreground
 
 ---
 apiVersion: autoscaling/v1

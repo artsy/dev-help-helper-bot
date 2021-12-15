@@ -74,7 +74,7 @@ slackEvents.on("message", async (event) => {
     await web.chat.postEphemeral({
       channel: event.channel,
       user: event.user,
-      text: "Remember: You can mark this as solved by typing a message in this thread with a body of just `solved`.",
+      text: "Remember: You can mark this thread as solved by writing a message with just the word \"solved\" and I will mark it with ✅.",
       thread_ts: event.thread_ts,
     })
   }

@@ -1,6 +1,8 @@
 # `#dev-help` Helper Bot
 
-This bot is marking thread that are solved by adding a ✅ on them.
+This bot automates a pattern that we've been using at Artsy, where a question is asked in Slack and then, if it's answered, the dev marks the thread with an emoji checkmark. 
+
+Having to go and find that little checkmark is a bit annoying though! So now all the original questioner needs to do is type `solved` into the thread and the bot will automatically add the ✅ for them, making the process a bit more efficient.
 
 ## Meta
 

@@ -20,3 +20,4 @@ Having to go and find that little checkmark is a bit annoying though! So now all
 - Click `Save Changes` at the bottom of the page.
 - **Make sure to put the previous endpoint for Slack back in that `Request URL` field. It's at the top of this file, but here is is again. https://dev-help-helper-bot-staging.artsy.net/slack/events**
 - Click `Save Changes` at the bottom of the page.
+test

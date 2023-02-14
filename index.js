@@ -56,9 +56,10 @@ slackEvents.on("message", async (event) => {
   // dont bother if the checkmark is there already
   if (await hasCheckmarkReaction(event.channel, event.thread_ts)) return
 
-  console.log(
-    `Received a message event: user ${event.user} in channel ${event.channel} says ${event.text} at ${event.ts}`
-  )
+  // ONLY USE THIS WHEN DEBUGGING. REMOVE THIS AGAIN WHEN YOU ARE DONE. THIS IS LOGGED ON PAPERTRAIL, SO IT'S BETTER TO NOT HAVE THIS PRINTING THERE.
+  // console.log(
+  //   `Received a message event: user ${event.user} in channel ${event.channel} says ${event.text} at ${event.ts}`
+  // )
 
   const text = event.text.toLowerCase()
   if (text === "solved") {

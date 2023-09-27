@@ -119,7 +119,7 @@ spec:
   type: ClusterIP
 
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: dev-help-helper-bot
@@ -134,5 +134,7 @@ spec:
           - path: /
             pathType: Prefix
             backend:
-              serviceName: dev-help-helper-bot-web-internal
-              servicePort: http
+              service:
+                name: dev-help-helper-bot-web-internal
+                port:
+                  name: http

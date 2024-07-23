@@ -108,8 +108,7 @@ async function handleMessagesForBugWorkflowReminder(event) {
                   text: '▶️  Report Bug',
                 },
                 style: 'primary',
-                url: 'https://slack.com/shortcuts/Ft074LRBHCE6/8e9a1ef94c02a74bbb6e2aee43b22d87',
-                action_id: 'start_workflow'
+                url: 'https://slack.com/shortcuts/Ft074LRBHCE6/8e9a1ef94c02a74bbb6e2aee43b22d87'
               }
             ]
           }

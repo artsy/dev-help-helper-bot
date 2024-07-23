@@ -66,8 +66,6 @@ slackEvents.on("message", async (event) => {
     console.log("mark it!")
     await addCheckmarkReaction(event.channel, event.thread_ts)
   } else if (
-    text.includes("thanks") ||
-    text.includes("thank you") ||
     text.includes("thank") ||
     text.startsWith("ty") ||
     text.includes("solved")

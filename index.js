@@ -66,7 +66,7 @@ async function handleThreadMessages(event) {
     console.log("mark it!");
     await addCheckmarkReaction(event.channel, event.thread_ts);
   } else if (/thank|^ty|solved/.test(text)) {
-    const reminderMessage = 'Remember: Mark this thread as solved by clicking the button or replying `solved`. ✅'
+    const reminderMessage = 'Mark this thread as solved by clicking the button or replying `solved`.'
     
     await web.chat.postEphemeral({
       channel: event.channel,

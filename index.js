@@ -12,6 +12,7 @@ const slackSigningSecret = process.env.SLACK_SIGNING_SECRET
 const slackEvents = createEventAdapter(slackSigningSecret)
 const port = process.env.PORT || 8080
 
+const ACTION_MARK_SOLVED = 'mark_solved'
 const CHANNELS_TO_EXCLUDE = [
   // 'C012K7XU4LE', // bot-testing
 ]
@@ -50,27 +51,52 @@ const hasCheckmarkReaction = async (channel, timestamp) => {
 
 async function handleThreadMessages(event) {
   // dont bother if the message is not from the question asker
-  if (event.user !== event.parent_user_id) return
+  if (event.user !== event.parent_user_id) return;
 
   // dont bother if the checkmark is there already
-  if (await hasCheckmarkReaction(event.channel, event.thread_ts)) return
+  if (await hasCheckmarkReaction(event.channel, event.thread_ts)) return;
 
   // ONLY USE THIS WHEN DEBUGGING. REMOVE THIS AGAIN WHEN YOU ARE DONE. THIS IS LOGGED ON PAPERTRAIL, SO IT'S BETTER TO NOT HAVE THIS PRINTING THERE.
   // console.log(
   //   `Received a message event: user ${event.user} in channel ${event.channel} says ${event.text} at ${event.ts}`
   // )
 
-  const text = event.text.toLowerCase()
+  const text = event.text.toLowerCase();
   if (text === "solved") {
-    console.log("mark it!")
-    await addCheckmarkReaction(event.channel, event.thread_ts)
+    console.log("mark it!");
+    await addCheckmarkReaction(event.channel, event.thread_ts);
   } else if (/thank|^ty|solved/.test(text)) {
+    const reminderMessage = 'Remember: Mark this thread as solved by clicking the button or replying `solved`. ✅'
+    
     await web.chat.postEphemeral({
       channel: event.channel,
       user: event.user,
-      text: "Remember: You can mark this thread as solved by writing a message with just the word \"solved\" and I will mark it with ✅.",
+      text: reminderMessage,
       thread_ts: event.thread_ts,
-    })
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: reminderMessage
+          },
+        },
+        {
+          type: 'actions',
+          elements: [
+            {
+              type: 'button',
+              text: {
+                type: 'plain_text',
+                text: '✅  Mark as Solved',
+              },
+              style: 'primary',
+              action_id: 'mark_solved'
+            }
+          ]
+        }
+      ]
+    });
   }
 }
 
@@ -136,6 +162,24 @@ slackEvents.on("message", async (event) => {
 const app = express()
 
 app.use("/slack/events", slackEvents.requestListener())
+
+app.post("/slack/actions", express.urlencoded({ extended: true }), async (req, res) => {
+  const payload = JSON.parse(req.body.payload);
+
+  if (payload.actions[0].action_id === ACTION_MARK_SOLVED) {
+    const { channel, message } = payload;
+
+    try {
+      await addCheckmarkReaction(channel.id, message.thread_ts || message.ts);
+      res.send('');
+    } catch (error) {
+      console.error('Error adding checkmark reaction:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  } else {
+    res.status(400).send('Bad Request');
+  }
+});
 
 app.get("/health/ping", (req, res) => res.send("pong"))
 

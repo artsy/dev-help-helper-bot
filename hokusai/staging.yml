@@ -122,11 +122,11 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: dev-help-helper-bot
+  name: dev-help-helper-bot-2025
   annotations:
     nginx.ingress.kubernetes.io/whitelist-source-range: "{{ cloudflareIpSourceRanges|join(',') }}"
 spec:
-  ingressClassName: nginx
+  ingressClassName: external-nginx
   rules:
     - host: dev-help-helper-bot-staging.artsy.net
       http:

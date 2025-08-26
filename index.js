@@ -12,6 +12,16 @@ const slackSigningSecret = process.env.SLACK_SIGNING_SECRET
 const slackEvents = createEventAdapter(slackSigningSecret)
 const port = process.env.PORT || 8080
 
+const CHANNELS_TO_EXCLUDE = [
+  // 'C012K7XU4LE', // bot-testing
+]
+
+const CHANNELS_FOR_BUGS_WORKFLOW_REMINDER = [
+  'C02E1D1G3B3', // #chr-test
+  'C03N12SR0RK' // #product-bugs-and-feedback
+]
+
+
 const addCheckmarkReaction = async (channel, timestamp) => {
   try {
     await web.reactions.add({ name: "white_check_mark", channel, timestamp })
@@ -38,18 +48,7 @@ const hasCheckmarkReaction = async (channel, timestamp) => {
   }
 }
 
-const CHANNELS_TO_EXCLUDE = [
-  // 'C012K7XU4LE', // bot-testing
-]
-
-// Attach listeners to events by Slack Event "type". See: https://api.slack.com/events/message.im
-slackEvents.on("message", async (event) => {
-  // dont bother if its the channels we want to exclude
-  if (CHANNELS_TO_EXCLUDE.includes(event.channel)) return
-
-  // dont bother if its a top-level message in the channel
-  if (event.thread_ts == null) return
-
+async function handleThreadMessages(event) {
   // dont bother if the message is not from the question asker
   if (event.user !== event.parent_user_id) return
 
@@ -65,13 +64,7 @@ slackEvents.on("message", async (event) => {
   if (text === "solved") {
     console.log("mark it!")
     await addCheckmarkReaction(event.channel, event.thread_ts)
-  } else if (
-    text.includes("thanks") ||
-    text.includes("thank you") ||
-    text.includes("thank") ||
-    text.startsWith("ty") ||
-    text.includes("solved")
-  ) {
+  } else if (/thank|^ty|solved/.test(text)) {
     await web.chat.postEphemeral({
       channel: event.channel,
       user: event.user,
@@ -79,6 +72,65 @@ slackEvents.on("message", async (event) => {
       thread_ts: event.thread_ts,
     })
   }
+}
+
+async function handleMessagesForBugWorkflowReminder(event) {
+  // Ignore channels that are not suited for the Bug Workflow Reminder
+  if (!CHANNELS_FOR_BUGS_WORKFLOW_REMINDER.includes(event.channel)) return
+
+  const issueWordsRegex = /(bug|issue|reproduce|complain|replicate)/i
+  const ignoreWordsRegex = /feedback/i
+  const reminderMessage = `Oops! 🐞\nIt seems you found a bug, <@${event.user}>. Please use the Product Bugs Report workflow. Thanks! 🙌`
+
+  if (issueWordsRegex.test(event.text) && !ignoreWordsRegex.test(event.text)) {
+    try {
+      // Reply to the message in a thread
+      await web.chat.postEphemeral({
+        channel: event.channel,
+        user: event.user,
+        text: reminderMessage,
+        thread_ts: event.thread_ts,
+        blocks: [
+          {
+            type: 'section',
+            text: {
+              type: 'mrkdwn',
+              text: reminderMessage
+            },
+          },
+          {
+            type: 'actions',
+            elements: [
+              {
+                type: 'button',
+                text: {
+                  type: 'plain_text',
+                  text: '▶️  Report Bug',
+                },
+                style: 'primary',
+                url: 'https://slack.com/shortcuts/Ft074LRBHCE6/8e9a1ef94c02a74bbb6e2aee43b22d87'
+              }
+            ]
+          }
+        ]
+      });
+    } catch (error) {
+      console.error(error)
+    }
+  }
+}
+
+// Attach listeners to events by Slack Event "type". See: https://api.slack.com/events/message.im
+slackEvents.on("message", async (event) => {
+  // dont bother if its the channels we want to exclude
+  if (CHANNELS_TO_EXCLUDE.includes(event.channel)) return
+
+  if (event.thread_ts == null) {
+    await handleMessagesForBugWorkflowReminder(event)
+  } else {
+    await handleThreadMessages(event)
+  }
+  
 })
 
 const app = express()

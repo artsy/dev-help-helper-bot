@@ -82,7 +82,7 @@ spec:
                       - foreground
 
 ---
-apiVersion: autoscaling/v1
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: dev-help-helper-bot-web
@@ -94,7 +94,13 @@ spec:
     name: dev-help-helper-bot-web
   minReplicas: 1
   maxReplicas: 3
-  targetCPUUtilizationPercentage: 70
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
 
 ---
 apiVersion: v1
